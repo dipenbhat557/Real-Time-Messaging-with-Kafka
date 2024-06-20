@@ -1,11 +1,12 @@
-# Use the official Maven image to build the application
-FROM maven:latest AS build
-WORKDIR /backend
+# Use Maven to build the application
+FROM maven:3.8.4-openjdk-17-slim AS build
+WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Use the official OpenJDK image to run the application
-FROM openjdk:latest
-WORKDIR /backend
-COPY --from=build /backend/target/backend.jar /backend/backend.jar
-ENTRYPOINT ["java", "-jar", "/backend/backend.jar"]
+# Use the OpenJDK image to run the application
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar /app/backend.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app/backend.jar"]
